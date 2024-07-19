@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.coratch.ingot</groupId>
+    <artifactId>pdf-ingot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <itext7.version>7.2.2</itext7.version>
+    </properties>
+
+   <dependencies>
+       <!--Pdf依赖-->
+       <dependency>
+           <groupId>com.itextpdf</groupId>
+           <artifactId>itext7-core</artifactId>
+           <type>pom</type>
+           <version>${itext7.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>com.itextpdf</groupId>
+           <artifactId>sign</artifactId>
+           <version>${itext7.version}</version>
+       </dependency>
+       <!--分词依赖-->
+       <dependency>
+           <groupId>org.ansj</groupId>
+           <artifactId>ansj_seg</artifactId>
+           <version>5.1.1</version>
+       </dependency>
+       <!--基础依赖-->
+       <dependency>
+           <groupId>org.projectlombok</groupId>
+           <artifactId>lombok</artifactId>
+           <version>1.18.24</version>
+       </dependency>
+   </dependencies>
+
+</project>
