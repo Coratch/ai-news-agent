@@ -4,7 +4,8 @@ import { fetchAllFeeds } from './feeds.js';
 import { extractContent } from './extractor.js';
 import { quickFilter, deepAnalyze } from './analyzer.js';
 import { filterNew, markProcessed, closeDb } from './storage.js';
-import { printResults, generateMarkdownReport } from './output.js';
+import { printResults, generateMarkdownReport, generateHtmlReport } from './output.js';
+import { exec } from 'child_process';
 
 /**
  * dry-run 模式：基于关键词做本地匹配 + mock 分析
@@ -106,6 +107,7 @@ export async function run(options = {}) {
     if (dryRun) {
       // dry-run: 用 RSS 摘要做简单总结
       article.analysis = {
+        titleZh: article.title,
         summary: article.summary.slice(0, 150) || '（RSS 摘要为空，需通过 AI 分析获取详情）',
         keyPoints: [`来源: ${article.feedName}`, `关键词匹配: ${article.matchedTopic.name}`],
         actionable: article.matchedTopic.priority === 'high',
@@ -139,6 +141,22 @@ export async function run(options = {}) {
     const reportPath = generateMarkdownReport(results, stats, config.output.markdown.dir);
     if (reportPath) {
       console.log(`📄 报告已保存: ${reportPath}`);
+    }
+  }
+
+  if (config.output.html?.enabled !== false) {
+    const htmlDir = config.output.html?.dir || config.output.markdown?.dir;
+    if (htmlDir) {
+      const htmlPath = generateHtmlReport(results, stats, htmlDir);
+      if (htmlPath) {
+        console.log(`🌐 HTML 报告已保存: ${htmlPath}`);
+        if (config.output.html?.autoOpen !== false) {
+          const openCmd = process.platform === 'darwin' ? 'open'
+            : process.platform === 'win32' ? 'start'
+            : 'xdg-open';
+          exec(`${openCmd} "${htmlPath}"`);
+        }
+      }
     }
   }
 

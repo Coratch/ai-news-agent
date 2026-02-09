@@ -83,6 +83,7 @@ program
       output: {
         terminal: true,
         markdown: { enabled: true, dir: '~/.ai-news-agent/reports' },
+        html: { enabled: true, dir: '~/.ai-news-agent/reports', autoOpen: true },
       },
       claude: {
         model: 'claude-haiku-4-5-20251001',

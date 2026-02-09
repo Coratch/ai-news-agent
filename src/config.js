@@ -24,6 +24,7 @@ const DEFAULT_CONFIG = {
   output: {
     terminal: true,
     markdown: { enabled: true, dir: path.join(CONFIG_DIR, 'reports') },
+    html: { enabled: true, dir: path.join(CONFIG_DIR, 'reports'), autoOpen: true },
   },
   claude: {
     model: 'claude-haiku-4-5-20251001',
@@ -54,6 +55,9 @@ export function loadConfig() {
   // 展开 ~ 路径
   if (config.output?.markdown?.dir) {
     config.output.markdown.dir = config.output.markdown.dir.replace(/^~/, os.homedir());
+  }
+  if (config.output?.html?.dir) {
+    config.output.html.dir = config.output.html.dir.replace(/^~/, os.homedir());
   }
   return config;
 }
