@@ -1,0 +1,56 @@
+# AI News Agent 配置文件
+# 复制此文件到 ~/.ai-news-agent/config.yaml 并修改
+
+# RSS 订阅源
+feeds:
+  - name: "Anthropic Blog"
+    url: "https://www.anthropic.com/rss.xml"
+  - name: "OpenAI Blog"
+    url: "https://openai.com/blog/rss.xml"
+  - name: "Hacker News - AI"
+    url: "https://hnrss.org/newest?q=AI+LLM+agent"
+  - name: "The Verge - AI"
+    url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+
+# 用户关注的 topics
+topics:
+  - name: "Claude Code 版本特性"
+    description: "Claude Code CLI 工具的新版本发布、新功能、效率提升特性、MCP 工具链更新"
+    keywords:
+      - "claude code"
+      - "claude cli"
+      - "anthropic cli"
+      - "claude agent"
+    priority: high
+
+  - name: "AI 编程工具动态"
+    description: "Cursor、GitHub Copilot、Windsurf 等 AI 编程辅助工具的重大更新和新功能"
+    keywords:
+      - "cursor"
+      - "copilot"
+      - "windsurf"
+      - "ai coding"
+      - "ai ide"
+    priority: medium
+
+  - name: "LLM 前沿进展"
+    description: "大语言模型的重要技术突破、新模型发布、benchmark 结果"
+    keywords:
+      - "gpt"
+      - "claude"
+      - "gemini"
+      - "llama"
+      - "benchmark"
+    priority: low
+
+# 输出设置
+output:
+  terminal: true
+  markdown:
+    enabled: true
+    dir: "~/.ai-news-agent/reports"
+
+# Claude API 设置
+claude:
+  model: "claude-haiku-4-5-20251001"
+  max_articles_per_run: 50

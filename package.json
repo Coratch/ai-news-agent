@@ -1,0 +1,53 @@
+{
+  "name": "@coratch/ai-news-agent",
+  "version": "1.0.0",
+  "description": "AI 前沿资讯智能订阅 Agent - 自动抓取 RSS、Claude AI 匹配关注点、生成中文摘要报告",
+  "type": "module",
+  "bin": {
+    "ai-news": "./bin/ai-news.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "config.example.yaml",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node bin/ai-news.js run",
+    "dev": "node bin/ai-news.js"
+  },
+  "keywords": [
+    "ai",
+    "news",
+    "rss",
+    "claude",
+    "agent",
+    "newsletter",
+    "anthropic",
+    "llm"
+  ],
+  "author": "Coratch",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Coratch/ai-news-agent.git"
+  },
+  "homepage": "https://github.com/Coratch/ai-news-agent#readme",
+  "bugs": {
+    "url": "https://github.com/Coratch/ai-news-agent/issues"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "better-sqlite3": "^11.7.0",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "inquirer": "^12.3.2",
+    "linkedom": "^0.18.6",
+    "ora": "^8.1.1",
+    "rss-parser": "^3.13.0",
+    "yaml": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
