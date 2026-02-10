@@ -1,6 +1,6 @@
 {
   "name": "@coratch/ai-news-agent",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI 前沿资讯智能订阅 Agent - 自动抓取 RSS、Claude AI 匹配关注点、生成中文摘要报告",
   "type": "module",
   "bin": {
