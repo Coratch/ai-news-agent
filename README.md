@@ -1,6 +1,6 @@
 # AI News Agent
 
-AI 前沿资讯智能订阅 Agent — 自动抓取 RSS 订阅源，通过 Claude AI 匹配用户关注点，生成中文摘要报告。
+AI 前沿资讯智能订阅 Agent — 自动抓取 RSS 订阅源，通过 AI 智能匹配用户关注点，生成中文摘要报告。支持 Anthropic Claude 和 MiniMax 双后端。
 
 ## 项目概览
 
@@ -17,8 +17,13 @@ AI 前沿资讯智能订阅 Agent — 自动抓取 RSS 订阅源，通过 Claude
 ## 架构
 
 ```
-RSS 订阅源 → 抓取解析 → 去重(SQLite) → AI 快速筛选 → 正文提取 → AI 深度分析 → 终端输出 + Markdown 报告
-                                         (阶段1: Haiku)                  (阶段2: Haiku)
+RSS 订阅源 → 抓取解析 → 去重(SQLite) → AI 快速筛选 → 正文提取 → AI 深度分析 → 终端输出 + Markdown/HTML 报告
+                                         (阶段1)                    (阶段2)
+                                    ┌─────────────────────┐
+                                    │  Anthropic Claude    │
+                              AI 后端│  或                  │
+                                    │  MiniMax (M2.1 等)   │
+                                    └─────────────────────┘
 ```
 
 **两阶段 AI 分析策略**（控制成本）：
@@ -46,9 +51,22 @@ npm link  # 全局注册 ai-news 命令
 
 ### 设置 API Key
 
+支持两种 AI 后端，选择其一即可：
+
+**方式 A：Anthropic Claude（默认）**
+
 ```bash
 export ANTHROPIC_API_KEY=your-api-key
 ```
+
+**方式 B：MiniMax**
+
+```bash
+export AI_PROVIDER=minimax
+export MINIMAX_API_KEY=your-api-key
+```
+
+> MiniMax 通过 Anthropic SDK 兼容端点接入，无需额外安装依赖。
 
 ### 初始化配置
 
@@ -97,11 +115,22 @@ topics:
     keywords: ["claude code", "claude cli"]
     priority: high  # high/medium/low
 
-# Claude API 设置
+# AI API 设置
+# 支持 Anthropic 和 MiniMax 双后端，通过环境变量 AI_PROVIDER 切换
 claude:
-  model: "claude-haiku-4-5-20251001"  # 用 Haiku 控成本
+  model: "claude-haiku-4-5-20251001"  # 或 MiniMax-M2.1 / MiniMax-M2.1-lightning
   max_articles_per_run: 50
 ```
+
+### 可用模型
+
+| 后端 | 模型 | 特点 |
+|------|------|------|
+| Anthropic | `claude-haiku-4-5-20251001` | 快速、低成本（默认） |
+| Anthropic | `claude-sonnet-4-5-20250929` | 更强能力 |
+| MiniMax | `MiniMax-M2.1` | 多语言编程能力强，~60 tps |
+| MiniMax | `MiniMax-M2.1-lightning` | 更快更轻量，~100 tps |
+| MiniMax | `MiniMax-M2` | 高级推理与 Agent 能力 |
 
 ## 输出示例
 
@@ -135,7 +164,7 @@ claude:
 |------|------|------|
 | RSS 解析 | rss-parser | 抓取和解析 RSS feed |
 | 正文提取 | linkedom | 从网页 HTML 提取正文 |
-| AI 分析 | @anthropic-ai/sdk | Claude API 匹配+摘要 |
+| AI 分析 | @anthropic-ai/sdk | AI 匹配+摘要（支持 Anthropic / MiniMax） |
 | 数据存储 | better-sqlite3 | 文章去重和历史记录 |
 | CLI 框架 | commander + inquirer | 命令行交互 |
 | 终端美化 | chalk + ora | 彩色输出和进度动画 |
@@ -151,7 +180,7 @@ ai-news-agent/
 │   ├── config.js            # 配置管理
 │   ├── feeds.js             # RSS 抓取
 │   ├── extractor.js         # 网页正文提取
-│   ├── analyzer.js          # Claude API 分析
+│   ├── analyzer.js          # AI 分析（Anthropic / MiniMax 双后端）
 │   ├── storage.js           # SQLite 去重存储
 │   └── output.js            # 终端+Markdown 输出
 ├── config.example.yaml      # 配置示例
@@ -166,7 +195,7 @@ ai-news-agent/
 | 每日信息获取时间 | 30-60 分钟 | 2 分钟（看报告） |
 | 遗漏重要资讯概率 | 高 | 低（自动化覆盖） |
 | 英文资讯理解成本 | 高 | 低（中文摘要） |
-| API 成本 | - | ~$0.01/次（Haiku） |
+| API 成本 | - | ~$0.01/次（Haiku / MiniMax） |
 
 ## 后续规划
 

@@ -50,7 +50,15 @@ output:
     enabled: true
     dir: "~/.ai-news-agent/reports"
 
-# Claude API 设置
+# AI API 设置
+# 支持两种后端：
+#   1. Anthropic（默认）: export ANTHROPIC_API_KEY=your-key
+#   2. MiniMax:          export AI_PROVIDER=minimax && export MINIMAX_API_KEY=your-key
+#
+# MiniMax 可用模型:
+#   - MiniMax-M2.1           综合能力最强，~60 tps
+#   - MiniMax-M2.1-lightning  更快更轻量，~100 tps
+#   - MiniMax-M2             高级推理与 Agent 能力
 claude:
-  model: "claude-haiku-4-5-20251001"
+  model: "claude-haiku-4-5-20251001"   # MiniMax 示例: "MiniMax-M2.1"
   max_articles_per_run: 50

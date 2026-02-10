@@ -37,11 +37,20 @@ export async function run(options = {}) {
   const { dryRun = false } = options;
 
   // 检查 API Key（dry-run 模式跳过）
-  if (!dryRun && !process.env.ANTHROPIC_API_KEY) {
-    console.error('❌ 未设置 ANTHROPIC_API_KEY 环境变量');
-    console.error('   请运行: export ANTHROPIC_API_KEY=your-api-key');
-    console.error('   或使用 --dry-run 模式跳过 AI 分析');
-    process.exit(1);
+  const provider = (process.env.AI_PROVIDER || 'anthropic').toLowerCase();
+  if (!dryRun) {
+    if (provider === 'minimax' && !process.env.MINIMAX_API_KEY) {
+      console.error('❌ 未设置 MINIMAX_API_KEY 环境变量');
+      console.error('   请运行: export MINIMAX_API_KEY=your-api-key');
+      console.error('   或使用 --dry-run 模式跳过 AI 分析');
+      process.exit(1);
+    }
+    if (provider === 'anthropic' && !process.env.ANTHROPIC_API_KEY) {
+      console.error('❌ 未设置 ANTHROPIC_API_KEY 环境变量');
+      console.error('   请运行: export ANTHROPIC_API_KEY=your-api-key');
+      console.error('   或使用 --dry-run 模式跳过 AI 分析');
+      process.exit(1);
+    }
   }
 
   const config = loadConfig();

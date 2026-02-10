@@ -2,9 +2,23 @@ import Anthropic from '@anthropic-ai/sdk';
 
 let client = null;
 
+/**
+ * 获取 AI 客户端（支持 Anthropic / MiniMax 后端）
+ *
+ * MiniMax 通过 Anthropic SDK 兼容端点接入，只需切换 baseURL 和 apiKey。
+ * 环境变量 AI_PROVIDER=minimax 时使用 MiniMax，否则默认 Anthropic。
+ */
 function getClient() {
   if (!client) {
-    client = new Anthropic();
+    const provider = (process.env.AI_PROVIDER || 'anthropic').toLowerCase();
+    if (provider === 'minimax') {
+      client = new Anthropic({
+        baseURL: 'https://api.minimax.io/anthropic',
+        apiKey: process.env.MINIMAX_API_KEY,
+      });
+    } else {
+      client = new Anthropic();
+    }
   }
   return client;
 }
