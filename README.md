@@ -17,7 +17,7 @@ AI 前沿资讯智能订阅 Agent — 自动抓取 RSS 订阅源，通过 AI 智
 ## 架构
 
 ```
-RSS 订阅源 → 抓取解析 → 去重(SQLite) → AI 快速筛选 → 正文提取 → AI 深度分析 → 终端输出 + Markdown/HTML 报告
+RSS 订阅源 → 抓取解析 → 去重(SQLite) → AI 快速筛选 → 正文提取 → AI 深度分析 → 多格式输出(终端/Markdown/HTML/邮件)
                                          (阶段1)                    (阶段2)
                                     ┌─────────────────────┐
                                     │  Anthropic Claude    │
@@ -95,8 +95,10 @@ ai-news run --dry-run
 | `ai-news run --dry-run` | 跳过 AI，使用本地关键词匹配 |
 | `ai-news add-feed` | 添加 RSS 订阅源 |
 | `ai-news add-topic` | 添加关注主题 |
+| `ai-news config-email` | 交互式配置邮件通知 |
+| `ai-news test-email` | 发送测试邮件验证配置 |
 | `ai-news history` | 查看历史匹配记录 |
-| `ai-news config` | 显示当前配置 |
+| `ai-news config` | 显示当前配置（含邮件状态） |
 
 ## 配置文件
 
@@ -114,6 +116,21 @@ topics:
     description: "Claude Code CLI 工具的新版本发布、新功能、效率提升特性"
     keywords: ["claude code", "claude cli"]
     priority: high  # high/medium/low
+
+# 邮件通知（可选，运行 ai-news config-email 交互式配置）
+output:
+  email:
+    enabled: false
+    smtp:
+      host: "smtp.163.com"
+      port: 465
+      secure: true
+      user: "your-email@163.com"
+      pass: "your-auth-code"        # 邮箱授权码（非登录密码）
+    from: "AI News <your-email@163.com>"
+    to:
+      - "recipient@example.com"
+    subjectPrefix: "AI 资讯日报"
 
 # AI API 设置
 # 支持 Anthropic 和 MiniMax 双后端，通过环境变量 AI_PROVIDER 切换
@@ -154,9 +171,26 @@ claude:
   → 立即升级，后台 Agent 对多任务开发场景有直接帮助
 ```
 
-### Markdown 报告
+### Markdown / HTML 报告
 
-自动保存到 `~/.ai-news-agent/reports/YYYY-MM-DD.md`
+自动保存到 `~/.ai-news-agent/reports/YYYY-MM-DD.md` 和 `YYYY-MM-DD.html`
+
+### 邮件通知
+
+配置后，每次 `ai-news run` 匹配到文章会自动发送邮件报告：
+
+```bash
+# 1. 交互式配置 SMTP（支持 QQ、网易、Gmail 等）
+ai-news config-email
+
+# 2. 发送测试邮件验证
+ai-news test-email
+
+# 3. 正常运行，自动发送邮件
+ai-news run
+```
+
+邮件发送失败不会阻断主流程，本地报告始终正常生成。
 
 ## 技术栈
 
@@ -167,6 +201,7 @@ claude:
 | AI 分析 | @anthropic-ai/sdk | AI 匹配+摘要（支持 Anthropic / MiniMax） |
 | 数据存储 | better-sqlite3 | 文章去重和历史记录 |
 | CLI 框架 | commander + inquirer | 命令行交互 |
+| 邮件发送 | nodemailer | SMTP 邮件通知 |
 | 终端美化 | chalk + ora | 彩色输出和进度动画 |
 
 ## 项目结构
@@ -182,7 +217,8 @@ ai-news-agent/
 │   ├── extractor.js         # 网页正文提取
 │   ├── analyzer.js          # AI 分析（Anthropic / MiniMax 双后端）
 │   ├── storage.js           # SQLite 去重存储
-│   └── output.js            # 终端+Markdown 输出
+│   ├── output.js            # 终端+Markdown+HTML 输出
+│   └── email.js             # 邮件发送（SMTP/nodemailer）
 ├── config.example.yaml      # 配置示例
 ├── package.json
 └── README.md
@@ -199,7 +235,7 @@ ai-news-agent/
 
 ## 后续规划
 
-- [ ] 邮件通知（Resend/SMTP）
+- [x] 邮件通知（SMTP/nodemailer）
 - [ ] 定时任务（node-cron / 系统 crontab）
 - [ ] 更多 RSS 源预设（arxiv、GitHub trending 等）
 - [ ] Web UI 管理界面

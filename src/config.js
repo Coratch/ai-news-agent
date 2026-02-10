@@ -25,6 +25,13 @@ const DEFAULT_CONFIG = {
     terminal: true,
     markdown: { enabled: true, dir: path.join(CONFIG_DIR, 'reports') },
     html: { enabled: true, dir: path.join(CONFIG_DIR, 'reports'), autoOpen: true },
+    email: {
+      enabled: false,
+      smtp: { host: '', port: 465, secure: true, user: '', pass: '' },
+      from: '',
+      to: [],
+      subjectPrefix: 'AI 资讯日报',
+    },
   },
   claude: {
     model: 'claude-haiku-4-5-20251001',
@@ -96,5 +103,25 @@ export function addTopic(name, description, keywords, priority = 'medium') {
     throw new Error(`关注点已存在: ${name}`);
   }
   config.topics.push({ name, description, keywords, priority });
+  saveConfig(config);
+}
+
+/**
+ * 获取邮件配置
+ * @returns {object|null} 邮件配置，未配置时返回 null
+ */
+export function getEmailConfig() {
+  const config = loadConfig();
+  return config.output?.email || null;
+}
+
+/**
+ * 更新邮件配置
+ * @param {object} emailConfig - 邮件配置对象
+ */
+export function updateEmailConfig(emailConfig) {
+  const config = loadConfig();
+  if (!config.output) config.output = {};
+  config.output.email = emailConfig;
   saveConfig(config);
 }

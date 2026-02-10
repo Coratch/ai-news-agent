@@ -4,7 +4,8 @@ import { fetchAllFeeds } from './feeds.js';
 import { extractContent } from './extractor.js';
 import { quickFilter, deepAnalyze } from './analyzer.js';
 import { filterNew, markProcessed, closeDb } from './storage.js';
-import { printResults, generateMarkdownReport, generateHtmlReport } from './output.js';
+import { printResults, generateMarkdownReport, generateHtmlReport, generateHtmlContent } from './output.js';
+import { sendEmailReport } from './email.js';
 import { exec } from 'child_process';
 
 /**
@@ -166,6 +167,18 @@ export async function run(options = {}) {
           exec(`${openCmd} "${htmlPath}"`);
         }
       }
+    }
+  }
+
+  // 邮件发送（失败不阻断主流程）
+  if (config.output?.email?.enabled && results.length > 0) {
+    spinner = ora('正在发送邮件报告...').start();
+    try {
+      const emailHtml = generateHtmlContent(results, stats, { forEmail: true });
+      const { messageId } = await sendEmailReport(emailHtml, stats, results.length, config.output.email);
+      spinner.succeed(`邮件已发送 (${messageId})`);
+    } catch (err) {
+      spinner.fail(`邮件发送失败: ${err.message}`);
     }
   }
 

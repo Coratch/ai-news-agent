@@ -152,10 +152,14 @@ export function generateMarkdownReport(results, stats, outputDir) {
 }
 
 /**
- * 生成精美 HTML 报告
+ * 生成 HTML 内容（纯 HTML 字符串，供文件输出和邮件共用）
+ * @param {Array} results - 匹配结果
+ * @param {object} stats - 统计信息
+ * @param {object} options - { forEmail: boolean }
+ * @returns {string} 完整 HTML 字符串
  */
-export function generateHtmlReport(results, stats, outputDir) {
-  if (!results.length) return null;
+export function generateHtmlContent(results, stats, options = {}) {
+  const { forEmail = false } = options;
 
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0];
@@ -216,6 +220,48 @@ export function generateHtmlReport(results, stats, outputDir) {
   const totalMed = grouped.medium?.length || 0;
   const totalLow = grouped.low?.length || 0;
 
+  // 邮件模式：移除 @keyframes 动画、:hover 伪类、transition（邮件客户端不支持）
+  const animationStyles = forEmail ? '' : `
+    .stat-chip { transition: transform 0.2s; }
+    .stat-chip:hover { transform: translateY(-2px); }
+    .card {
+      transition: box-shadow 0.25s, transform 0.25s;
+      animation: fadeInUp 0.4s ease both;
+    }
+    .card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .read-more { transition: color 0.2s; }
+    .read-more:hover { color: #764ba2; }
+    .read-more svg { transition: transform 0.2s; }
+    .read-more:hover svg { transform: translate(2px, -2px); }`;
+
+  const heroPseudoStyle = forEmail ? '' : `
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }`;
+
   const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -242,20 +288,7 @@ export function generateHtmlReport(results, stats, outputDir) {
       position: relative;
       overflow: hidden;
     }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
-      animation: pulse 8s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 1; }
-    }
+    ${heroPseudoStyle}
     .hero h1 {
       font-size: 2rem;
       font-weight: 700;
@@ -290,9 +323,7 @@ export function generateHtmlReport(results, stats, outputDir) {
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: transform 0.2s;
     }
-    .stat-chip:hover { transform: translateY(-2px); }
     .stat-chip .num { font-size: 1.1rem; }
     .stat-chip.high .num { color: #ef4444; }
     .stat-chip.medium .num { color: #f59e0b; }
@@ -310,22 +341,8 @@ export function generateHtmlReport(results, stats, outputDir) {
       padding: 24px 28px;
       margin-bottom: 20px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      transition: box-shadow 0.25s, transform 0.25s;
-      animation: fadeInUp 0.4s ease both;
     }
-    .card:hover {
-      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-      transform: translateY(-3px);
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .card:nth-child(1) { animation-delay: 0.05s; }
-    .card:nth-child(2) { animation-delay: 0.1s; }
-    .card:nth-child(3) { animation-delay: 0.15s; }
-    .card:nth-child(4) { animation-delay: 0.2s; }
-    .card:nth-child(5) { animation-delay: 0.25s; }
+    ${animationStyles}
 
     .card-header {
       display: flex;
@@ -426,11 +443,7 @@ export function generateHtmlReport(results, stats, outputDir) {
       font-size: 0.88rem;
       font-weight: 600;
       text-decoration: none;
-      transition: color 0.2s;
     }
-    .read-more:hover { color: #764ba2; }
-    .read-more svg { transition: transform 0.2s; }
-    .read-more:hover svg { transform: translate(2px, -2px); }
 
     .footer {
       text-align: center;
@@ -480,6 +493,18 @@ export function generateHtmlReport(results, stats, outputDir) {
   </footer>
 </body>
 </html>`;
+
+  return html;
+}
+
+/**
+ * 生成精美 HTML 报告（写入文件）
+ */
+export function generateHtmlReport(results, stats, outputDir) {
+  if (!results.length) return null;
+
+  const html = generateHtmlContent(results, stats);
+  const dateStr = new Date().toISOString().split('T')[0];
 
   // 写入文件
   if (!fs.existsSync(outputDir)) {
