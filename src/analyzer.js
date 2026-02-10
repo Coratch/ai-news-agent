@@ -13,7 +13,7 @@ function getClient() {
     const provider = (process.env.AI_PROVIDER || 'anthropic').toLowerCase();
     if (provider === 'minimax') {
       client = new Anthropic({
-        baseURL: 'https://api.minimax.io/anthropic',
+        baseURL: 'https://api.minimaxi.com/anthropic',
         apiKey: process.env.MINIMAX_API_KEY,
       });
     } else {
