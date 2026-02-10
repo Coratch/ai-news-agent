@@ -71,7 +71,8 @@ ${articlesDesc}
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const text = response.content[0]?.text || '[]';
+      const textBlock = response.content.find(c => c.type === 'text');
+      const text = textBlock?.text || '[]';
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (!jsonMatch) continue;
 
@@ -133,7 +134,8 @@ ${content}
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const text = response.content[0]?.text || '{}';
+    const textBlock = response.content.find(c => c.type === 'text');
+    const text = textBlock?.text || '{}';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return { summary: '分析失败', keyPoints: [], actionable: false, recommendation: '' };
